@@ -93,7 +93,7 @@ pip install -r requirements.txt
 cd models
 git clone https://github.com/polimi-ispl/icpr2020dfdc
 cd icpr2020dfdc/notebook
-python3 ../../app.py
+python ../../app.py
 ```
 
 ### Lastly set up neoX destnet on your metamask wallet and get some test tokens from [here](https://neoxwish.ngd.network/).
