@@ -63,7 +63,7 @@ As the world of deepfake generation continues to evolve, we need to stay ahead o
 ## How to set up this project
 
 ```
-git clone https://github.com/HitG010/DeepTrace
+git clone https://github.com/NishCode17/DeepTrace
 npm i
 npm run dev
 cd Backend
