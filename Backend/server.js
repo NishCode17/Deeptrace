@@ -56,7 +56,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(
-    cors({
+  cors({
     origin: "http://localhost:5173",
     credentials: true, // If using cookies for authentication
   })
@@ -146,6 +146,8 @@ app.get("/logout", (req, res) => {
 });
 
 app.use(userRoutes);
+const apiRoutes = require("./Routes/api");
+app.use("/api", apiRoutes);
 
 app.post("/metadata-update", (req, res) => {
   const filePath = path.resolve(__dirname, req.body.filename);

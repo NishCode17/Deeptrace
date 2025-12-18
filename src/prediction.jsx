@@ -34,6 +34,40 @@ function VideoUpload() {
   //     });
   // };
 
+  const pollJobStatus = async (jobId, file) => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/job/${jobId}`);
+        if (response.status === 404) {
+          console.warn("Job not found yet, retrying...");
+          return;
+        }
+        const data = await response.json();
+
+        if (data.status === "COMPLETED") {
+          clearInterval(interval);
+          setLoaderActive(false);
+          const result = data.result;
+
+          if (result.mean_score < 0.5) {
+            uploadVideo(file, "Real");
+          } else {
+            uploadVideo(file, "Deepfake");
+          }
+
+          navigate("/result", { state: { result: result, fileName: file.name } });
+        } else if (data.status === "FAILED") {
+          clearInterval(interval);
+          setLoaderActive(false);
+          alert("Job Failed: " + (data.error || "Unknown error"));
+        }
+      } catch (err) {
+        // Network error handling (optional: count retries)
+        console.error("Polling error", err);
+      }
+    }, 2000);
+  };
+
   const handleUpload = async () => {
     if (!file) {
       alert("Please upload a video file.");
@@ -42,12 +76,14 @@ function VideoUpload() {
 
     const formData = new FormData();
     formData.append("video", file);
-    formData.append("frames_per_video", framesPerVideo);
+    // frames_per_video is configured on backend now, or passed if supported
+    // formData.append("frames_per_video", framesPerVideo); 
 
     setLoaderActive(true); // Show loader
 
     try {
-      const response = await fetch("http://127.0.0.1:8080/upload-video", {
+      // 1. Upload to Node.js Orchestrator
+      const response = await fetch("http://localhost:5000/api/upload", {
         method: "POST",
         body: formData,
       });
@@ -57,22 +93,15 @@ function VideoUpload() {
       }
 
       const data = await response.json();
-      setResult(data);
+      const jobId = data.jobId;
 
-      if (data.mean_score < 0.5) {
-        // metadataUpdate(file, "Real", data.mean_score*100);
-        uploadVideo(file, "Real");
-      } else {
-        // metadataUpdate(file, "Deepfake", data.mean_score*100);
-        uploadVideo(file, "Deepfake");
-      }
+      // 2. Poll for Status
+      pollJobStatus(jobId, file);
 
-      navigate("/result", { state: { result: data, fileName: file.name } });
     } catch (error) {
       console.error(error);
+      setLoaderActive(false);
       alert("An error occurred while uploading the video.");
-    } finally {
-      setLoaderActive(false); // Hide loader when upload finishes
     }
   };
 
@@ -90,9 +119,8 @@ function VideoUpload() {
 
       {/* Page Content */}
       <div
-        className={`w-screen flex justify-evenly ${
-          LoaderActive ? "opacity-50" : ""
-        }`}
+        className={`w-screen flex justify-evenly ${LoaderActive ? "opacity-50" : ""
+          }`}
       >
         <div className="tiers flex flex-col gap-4">
           <button
