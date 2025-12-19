@@ -9,7 +9,9 @@ from scipy.special import expit
 import sys
 import os
 import uuid
-sys.path.append('..')
+
+# Add the icpr2020dfdc submodule to the path so we can import its modules
+sys.path.append(os.path.join(os.path.dirname(__file__), 'icpr2020dfdc'))
 
 from blazeface import FaceExtractor, BlazeFace, VideoReader
 from architectures import fornet,weights
@@ -48,8 +50,9 @@ net.load_state_dict(load_url(model_url,map_location=device,check_hash=True))
 transf = utils.get_transformer(face_policy, face_size, net.get_normalizer(), train=False)
 
 facedet = BlazeFace().to(device)
-facedet.load_weights("../blazeface/blazeface.pth")
-facedet.load_anchors("../blazeface/anchors.npy")
+# Update paths to point to the submodule location
+facedet.load_weights(os.path.join(os.path.dirname(__file__), "icpr2020dfdc/blazeface/blazeface.pth"))
+facedet.load_anchors(os.path.join(os.path.dirname(__file__), "icpr2020dfdc/blazeface/anchors.npy"))
 
 @app.route('/predict', methods=['POST'])
 def predict():

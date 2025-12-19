@@ -1,6 +1,6 @@
 # DeepTrace
 
-![DeepTrace Cover](public/deeptrace_cover.png)
+![DeepTrace Cover](Frontend/public/deeptrace_cover.png)
 
 ## Overview
 
@@ -65,6 +65,10 @@ This project is intended primarily for code review and architectural discussion.
 2.  **Start the Backend Orchestrator**
     ```bash
     cd Backend
+    # Copy example environment variables
+    cp .env.example .env
+    # Edit .env to add your Google Auth credentials if needed
+    
     npm install
     npm run dev
     ```
@@ -72,13 +76,15 @@ This project is intended primarily for code review and architectural discussion.
 3.  **Start the ML Worker**
     ```bash
     # In a new terminal
+    cd models
     pip install -r requirements.txt
-    python models/app.py
+    python app.py
     ```
 
 4.  **Run Frontend**
     ```bash
     # In a new terminal
+    cd Frontend
     npm install
     npm run dev
     ```

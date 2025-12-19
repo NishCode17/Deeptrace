@@ -11,20 +11,18 @@ require("dotenv").config();
 const userRoutes = require("./Routes/userRoutes");
 const path = require('path');
 
-const mongoURI =
-  "mongodb+srv://bindrakartik64:tazQbHPsNKxybIps@deeptrace.km0n1.mongodb.net/?retryWrites=true&w=majority&appName=DeepTrace";
+const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/DeepTrace";
 
 mongoose
   .connect(mongoURI, {
-    dbName: "DeepTrace",
-    useNewUrlParser: true,
-    // useUnifiedTopology: true,
+    // useNewUrlParser: true, // Deprecated in newer Mongoose
+    // useUnifiedTopology: true, // Default in newer Mongoose
   })
   .then(() => {
-    console.log("Connected to MongoDB");
+    console.log(`Connected to MongoDB at ${mongoURI}`);
   })
   .catch((err) => {
-    console.log(err);
+    console.error("MongoDB connection error:", err);
   });
 
 const app = express();
