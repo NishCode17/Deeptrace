@@ -4,9 +4,9 @@
 
 ## Overview
 
-Deepfakes and synthetic media are becoming increasingly sophisticated, creating a need for reliable detection mechanisms. DeepTrace is a system designed to assess media authenticity using multiple deepfake detection models.
+Deepfakes and synthetic media are becoming increasingly sophisticated, making it harder to distinguish real content from manipulated media. DeepTrace is a system designed to analyze video content and assess its authenticity using multiple deepfake detection models.
 
-The project centers on a backend-orchestrated architecture that manages long-running ML inference tasks. It explicitly separates the API layer from the compute-intensive detection layer, using a job-based model to ensure responsiveness and reliability during heavy processing loads.
+The platform allows users to upload media, track analysis progress, and receive detailed detection results once processing is complete. It is built to handle computationally intensive detection workflows while maintaining a smooth and responsive user experience.
 
 ## Architecture
 
