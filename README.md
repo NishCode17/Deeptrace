@@ -1,53 +1,53 @@
 # DeepTrace
 
+![DeepTrace Cover](public/deeptrace_cover.png)
+
 ## Overview
 
-Deepfakes and synthetic media are becoming increasingly sophisticated, creating a need for reliable detection mechanisms. This project addresses the challenge of verifying media authenticity using a multi-model approach.
+Deepfakes and synthetic media are becoming increasingly sophisticated, creating a need for reliable detection mechanisms. DeepTrace is a system designed to assess media authenticity using multiple deepfake detection models.
 
-This repository serves as a reference implementation for **backend orchestration of ML inference**. It demonstrates how to decouple heavy compute tasks (deepfake detection) from user-facing interactions using an asynchronous, event-driven architecture. The focus is on robust job management, state handling, and integrating heterogeneous services (Node.js, Python/PyTorch, MongoDB) rather than just the ML models themselves.
+The project centers on a backend-orchestrated architecture that manages long-running ML inference tasks. It explicitly separates the API layer from the compute-intensive detection layer, using a job-based model to ensure responsiveness and reliability during heavy processing loads.
 
 ## Architecture
 
-The system is composed of the following distinct modules:
+The system is built on a decoupled architecture to handle the discrepancies between rapid user interactions and slow model inference:
 
-*   **Frontend (React)**: User interface for video upload and status monitoring.
-*   **Backend Orchestrator (Node.js + Express)**: Handles API requests, validation, and job creation.
-*   **ML Worker (Flask + PyTorch)**: A dedicated, stateless worker that polls for jobs and performs CPU/GPU-intensive inference.
-*   **MongoDB**: Acts as the central source of truth for job state (queue, processing, completion, failure).
-*   **Blockchain (Optional)**: Anchors verification results for immutability (NeoX Testnet).
-
-![Workflow](public/deepTrace_flowchart.png)
+*   **Frontend (React)**: Provides the user interface for video uploads and real-time status tracking.
+*   **Backend Orchestrator (Node.js + Express)**: Serves as the control plane. It handles API requests, validates inputs, and manages the lifecycle of detection jobs.
+*   **ML Worker (Flask + PyTorch)**: A dedicated, stateless worker process that processes jobs when invoked by the backend and executes CPU/GPU-intensive inference models.
+*   **MongoDB**: Acts as the single source of truth for job states (lifecycle tracking, processing status, results).
+*   **Blockchain (Optional)**: Utilized for anchoring verification results to ensure immutability (NeoX Testnet).
 
 ## Request Lifecycle
 
-The system prioritizes non-blocking execution to handle long-running ML processes:
+The request flow ensures non-blocking execution for the main server:
 
-1.  **Upload**: User uploads a video via the React frontend.
-2.  **Job Creation**: The Node.js orchestrator accepts the upload, saves the file locally, and creates a `Job` document in MongoDB with status `PENDING`. It immediately returns a `jobId` to the client.
-3.  **Background Processing**: The ML Worker (Python) periodically polls MongoDB for `PENDING` jobs.
-4.  **Job Claiming**: The worker atomically updates the job status to `PROCESSING` to prevent duplicate execution.
+1.  **Upload**: The user uploads a video file via the React frontend.
+2.  **Job Creation**: The Node.js orchestrator accepts the upload, stores the file, and creates a `Job` document in MongoDB with a `PENDING` status. A `jobId` is immediately returned to the client to release the connection.
+3.  **Job Dispatch**: The backend orchestrator dispatches the job to the ML worker for processing.
+4.  **Processing Initialization**: The worker updates the job status to `PROCESSING` to mark the start of execution.
 5.  **ML Inference**: The deepfake detection models run on the video content.
-6.  **Completion**: Results are written back to MongoDB, and the status is updated to `COMPLETED`.
-7.  **Result Retrieval**: The frontend polls the backend for job status and displays the final report once available.
+6.  **Completion**: Upon success, the worker writes the inference results to MongoDB and updates the status to `COMPLETED`.
+7.  **Result Retrieval**: The frontend polls the orchestrator for the job status and renders the classification report once the processing is finished.
 
 ## Backend Design Decisions
 
-*   **Async Job Orchestration**: Utilizes MongoDB as a persistent queue instead of in-memory queues or Redis, simplifying deployment and state inspection.
-*   **Stateless ML Worker**: The Python worker is decoupled from the web server. It can be restarted or scaled independently without affecting incoming HTTP requests.
-*   **Atomic Job Claiming**: Uses `findOneAndUpdate` to ensure that only one worker picks up a specific job, preventing race conditions.
-*   **Failure-Aware Job States**: explicitly handles error states (`FAILED`) to ensure the system doesn't stall on bad inputs.
+*   **Async Job Orchestration**: The system uses MongoDB as a persistent job state store. This avoids the operational complexity of a separate message broker for this scale while providing full visibility into job history and state.
+*   **Stateless ML Worker**: The Python inference engine is completely decoupled from the Node.js web server. This allows the compute layer to restart or crash without bringing down the API gateway.
+*   **Job State Synchronization**: Uses atomic database updates to manage job lifecycle transitions, ensuring consistency across system components.
+*   **Failure-Aware Job States**: The state machine explicitly handles `FAILED` states, ensuring the UI can provide feedback during model crashes or corrupt file uploads.
 
 ## Tech Stack
 
 *   **Backend**: Node.js, Express
-*   **ML**: Python, Flask, PyTorch (Ensemble models), OpenCV
+*   **ML**: Python, Flask, PyTorch (Deepfake detection models), OpenCV
 *   **Database**: MongoDB (Mongoose)
 *   **Frontend**: React, Vite, TailwindCSS
 *   **Blockchain**: Hardhat, Solidity (NeoX Testnet)
 
-## Setup (Minimal)
+## Setup
 
-This project is intended for code review and architecture discussion.
+This project is intended primarily for code review and architectural discussion. Local setup is provided for completeness.
 
 ### Prerequisites
 *   Node.js (v16+)
@@ -83,15 +83,10 @@ This project is intended for code review and architecture discussion.
     npm run dev
     ```
 
-## What This Project Demonstrates
+## Key Engineering Features
 
-*   **Backend Orchestration**: Managing long-running processes without blocking the main event loop.
-*   **Async ML Execution**: decoupling the API layer from the inference layer.
-*   **Separation of Concerns**: distinctive roles for control (Node.js) and compute (Python).
-*   **Robust State Management**: ensuring job states are tracked accurately across distributed components.
+*   **Backend Orchestration**: Implements a custom orchestration logic to manage asynchronous workflows.
+*   **Async ML Execution**: Handles heavy computational loads without blocking the event loop.
+*   **Separation of Concerns**: Strict boundary between the control plane (Node.js) and the compute plane (Python).
+*   **Robust State Management**: Tracks strict job states across distributed system components.
 
-## Explicit Non-Goals
-
-*   **Not Production-Scale**: The current polling mechanism is designed for simplicity, not high-throughput scale (which would require dedicated message queues).
-*   **Not Distributed ML**: Training is not handled here; this is purely an inference pipeline.
-*   **Not Federated Learning**: While the model architecture supports it theoretically, this implementation uses pre-trained weights.
