@@ -1,68 +1,109 @@
 # DeepTrace
 
-![DeepTrace Cover](Frontend/public/deeptrace_cover.png)
-
 ## Overview
 
-Deepfakes and synthetic media are becoming increasingly sophisticated, making it harder to distinguish real content from manipulated media. DeepTrace is a system designed to analyze video content and assess its authenticity using multiple deepfake detection models.
+DeepTrace is an application designed to analyze video content and detect whether it has been manipulated using deepfake techniques. The project explores how machine learning models can be applied to video analysis while providing a usable system for uploading media, tracking processing progress, and viewing detection results.
 
-The platform allows users to upload media, track analysis progress, and receive detailed detection results once processing is complete. It is built to handle computationally intensive detection workflows while maintaining a smooth and responsive user experience.
+The focus of DeepTrace is to demonstrate an end-to-end workflow for deepfake detection, combining machine learning inference with a web-based application.
 
-## Architecture
+---
 
-The system is built on a decoupled architecture to handle the discrepancies between rapid user interactions and slow model inference:
+## Problem Context
 
-*   **Frontend (React)**: Provides the user interface for video uploads and real-time status tracking.
-*   **Backend Orchestrator (Node.js + Express)**: Serves as the control plane. It handles API requests, validates inputs, and manages the lifecycle of detection jobs.
-*   **ML Worker (Flask + PyTorch)**: A dedicated, stateless worker process that processes jobs when invoked by the backend and executes CPU/GPU-intensive inference models.
-*   **MongoDB**: Acts as the single source of truth for job states (lifecycle tracking, processing status, results).
-*   **Blockchain (Optional)**: Utilized for anchoring verification results to ensure immutability (NeoX Testnet).
+With the increasing realism of deepfakes and synthetic media, verifying the authenticity of video content has become more challenging. Deepfake detection models can help identify manipulated content, but running such models on large video files is computationally expensive.
 
-## Request Lifecycle
+DeepTrace addresses this by:
+- allowing users to submit videos for analysis,
+- running deepfake detection models in the background,
+- returning structured detection results once processing is complete.
 
-The request flow ensures non-blocking execution for the main server:
+---
 
-1.  **Upload**: The user uploads a video file via the React frontend.
-2.  **Job Creation**: The Node.js orchestrator accepts the upload, stores the file, and creates a `Job` document in MongoDB with a `PENDING` status. A `jobId` is immediately returned to the client to release the connection.
-3.  **Job Dispatch**: The backend orchestrator dispatches the job to the ML worker for processing.
-4.  **Processing Initialization**: The worker updates the job status to `PROCESSING` to mark the start of execution.
-5.  **ML Inference**: The deepfake detection models run on the video content.
-6.  **Completion**: Upon success, the worker writes the inference results to MongoDB and updates the status to `COMPLETED`.
-7.  **Result Retrieval**: The frontend polls the orchestrator for the job status and renders the classification report once the processing is finished.
+## System Overview
 
-## Backend Design Decisions
+DeepTrace is implemented as a web-based system with clearly separated components:
 
-*   **Async Job Orchestration**: The system uses MongoDB as a persistent job state store. This avoids the operational complexity of a separate message broker for this scale while providing full visibility into job history and state.
-*   **Stateless ML Worker**: The Python inference engine is completely decoupled from the Node.js web server. This allows the compute layer to restart or crash without bringing down the API gateway.
-*   **Job State Synchronization**: Uses atomic database updates to manage job lifecycle transitions, ensuring consistency across system components.
-*   **Failure-Aware Job States**: The state machine explicitly handles `FAILED` states, ensuring the UI can provide feedback during model crashes or corrupt file uploads.
+- **Frontend (React)**  
+  Provides the user interface for uploading videos and checking analysis status.
+
+- **Backend (Node.js + Express)**  
+  Handles API requests, input validation, file handling, and tracking the status of analysis jobs.
+
+- **ML Service (Python + Flask)**  
+  Runs the deepfake detection models and performs video analysis.
+
+- **Database (MongoDB)**  
+  Stores job information, processing status, and detection results.
+
+An optional blockchain component was explored to store verification results immutably, but it is not required for the core functionality of the system.
+
+---
+
+## Workflow
+
+1. A user uploads a video through the web interface.
+2. The backend creates a job entry and returns a unique identifier.
+3. The video is processed by the ML service in the background.
+4. Detection results are saved once processing completes.
+5. The user can retrieve and view the results using the job identifier.
+
+This approach ensures that video analysis does not block user interactions.
+
+---
+
+## Machine Learning Components
+
+The ML component of DeepTrace focuses on video-based deepfake detection:
+
+- **Video Processing**  
+  Frames are extracted from the uploaded video and prepared for analysis.
+
+- **Deepfake Detection Models**  
+  Predefined deep learning models are used to analyze facial and visual features to classify videos as real or fake.
+
+- **Result Aggregation**  
+  Model outputs are aggregated into a final prediction that is returned to the application.
+
+The emphasis of the project is on applying existing deepfake detection models within a complete application workflow rather than developing new detection algorithms.
+
+---
+
+## Key Learnings
+
+- Integrating ML-based video analysis into a web application
+- Handling long-running video processing tasks without blocking APIs
+- Managing application state and results using a database
+- Coordinating communication between backend services and ML components
+
+---
 
 ## Tech Stack
 
-*   **Backend**: Node.js, Express
-*   **ML**: Python, Flask, PyTorch (Deepfake detection models), OpenCV
-*   **Database**: MongoDB (Mongoose)
-*   **Frontend**: React, Vite, TailwindCSS
-*   **Blockchain**: Hardhat, Solidity (NeoX Testnet)
+- **Frontend**: React, Vite
+- **Backend**: Node.js, Express
+- **ML**: Python, Flask, PyTorch, OpenCV
+- **Database**: MongoDB
+- **Optional**: Blockchain-based result anchoring (experimented)
+
+---
 
 ## Setup
 
-This project is intended primarily for code review and architectural discussion. Local setup is provided for completeness.
+This repository contains the full implementation of the system and can be run locally for experimentation and code review.
 
 ### Prerequisites
-*   Node.js (v16+)
-*   Python (3.8+)
-*   MongoDB running locally
+- Node.js (v16+)
+- Python (3.8+)
+- MongoDB
 
 ### Installation
 
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/NishCode17/DeepTrace
-    cd DeepTrace
-    ```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/NishCode17/DeepTrace
+   cd DeepTrace
 
-2.  **Start the Backend Orchestrator**
+2. **Start the Backend Orchestrator**
     ```bash
     cd Backend
     # Copy example environment variables
