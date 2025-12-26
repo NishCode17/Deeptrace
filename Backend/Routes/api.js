@@ -73,4 +73,37 @@ router.post('/upload', upload.single('video'), async (req, res) => {
     }
 });
 
+// GET /api/job/:id
+router.get('/job/:id', async (req, res) => {
+    try {
+        const jobId = req.params.id;
+
+        // 1. Validate ID format
+        if (!mongoose.Types.ObjectId.isValid(jobId)) {
+            return res.status(400).json({ error: 'Invalid Job ID format' });
+        }
+
+        // 2. Fetch Job
+        const job = await Job.findById(jobId);
+
+        if (!job) {
+            return res.status(404).json({ error: 'Job not found' });
+        }
+
+        // 3. Return Status & Result
+        // The frontend expects { status, result, error }
+        res.status(200).json({
+            jobId: job._id,
+            status: job.status,
+            result: job.result,
+            error: job.error,
+            createdAt: job.createdAt
+        });
+
+    } catch (error) {
+        console.error('Job Fetch Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 module.exports = router;
