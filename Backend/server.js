@@ -148,7 +148,7 @@ const apiRoutes = require("./Routes/api");
 app.use("/api", apiRoutes);
 
 app.post("/metadata-update", (req, res) => {
-  const filePath = path.resolve(__dirname, req.body.filename);
+  const filePath = path.resolve(__dirname, 'uploads', req.body.filename);
   const result = req.body.result;
   const accuracy = req.body.accuracy;
 
