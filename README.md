@@ -35,7 +35,7 @@ DeepTrace is implemented as a web-based system with clearly separated components
 - **Database (MongoDB)**  
   Stores job information, processing status, and detection results.
 
-An optional blockchain component was explored to store verification results immutably, but it is not required for the core functionality of the system.
+
 
 ---
 
@@ -83,7 +83,7 @@ The emphasis of the project is on applying existing deepfake detection models wi
 - **Backend**: Node.js, Express
 - **ML**: Python, Flask, PyTorch, OpenCV
 - **Database**: MongoDB
-- **Optional**: Blockchain-based result anchoring (experimented)
+
 
 ---
 
