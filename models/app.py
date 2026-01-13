@@ -11,27 +11,14 @@ import os
 import uuid
 
 # Add the icpr2020dfdc submodule to the path so we can import its modules
-sys.path.append(os.path.join(os.path.dirname(__file__), 'icpr2020dfdc'))
+# sys.path.append(os.path.join(os.path.dirname(__file__), 'icpr2020dfdc'))
 
 from blazeface import FaceExtractor, BlazeFace, VideoReader
 from architectures import fornet,weights
 from isplutils import utils
 
-"""
-Choose an architecture between
-- EfficientNetB4
-- EfficientNetB4ST
-- EfficientNetAutoAttB4
-- EfficientNetAutoAttB4ST
-- Xception
-"""
+# Model and Dataset Configuration
 net_model = 'EfficientNetAutoAttB4'
-
-"""
-Choose a training dataset between
-- DFDC
-- FFPP
-"""
 train_db = 'DFDC'
 
 app = Flask(__name__)
@@ -51,8 +38,8 @@ transf = utils.get_transformer(face_policy, face_size, net.get_normalizer(), tra
 
 facedet = BlazeFace().to(device)
 # Update paths to point to the submodule location
-facedet.load_weights(os.path.join(os.path.dirname(__file__), "icpr2020dfdc/blazeface/blazeface.pth"))
-facedet.load_anchors(os.path.join(os.path.dirname(__file__), "icpr2020dfdc/blazeface/anchors.npy"))
+facedet.load_weights(os.path.join(os.path.dirname(__file__), "blazeface/blazeface.pth"))
+facedet.load_anchors(os.path.join(os.path.dirname(__file__), "blazeface/anchors.npy"))
 
 @app.route('/predict', methods=['POST'])
 def predict():
