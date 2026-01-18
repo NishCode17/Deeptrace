@@ -8,12 +8,7 @@ import logo from '/src/assets/deeptrace_logo_transparent.png'
 function Home() {
   const [user, setUser] = useState(null);
   // const [account, setAccount] = useState(null);
-  async function getUserAddress() {
-    await newProvider.send('eth_requestAccounts', []);
-    const signer = newProvider.getSigner();
-    const Useraccount = await signer.getAddress();
-    setAccount(Useraccount);
-  }
+
   useEffect(() => {
     const fetchUserDetails = async () => {
       const userDetails = await getUserDetails();

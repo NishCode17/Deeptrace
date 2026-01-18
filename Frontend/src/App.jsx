@@ -9,7 +9,6 @@ import Signup from "./components/Signup/Signup.jsx";
 import Login from "./components/Login/Login.jsx";
 import VideoUpload from "./prediction.jsx";
 import Result from "./components/Result.jsx";
-// import {ContractDeets} from "./contractDeets.jsx";
 
 function App() {
   return (
