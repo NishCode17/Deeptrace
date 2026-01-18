@@ -19,7 +19,7 @@ function VideoUpload() {
   // update the metadata of the video with the result of the deepfake detection
   const metadataUpdate = async (file, result, accuracy) => {
     // const filePath = file.name;
-    fetch("http://localhost:5000/metadata-update", {
+    fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/metadata-update`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +37,7 @@ function VideoUpload() {
   const pollJobStatus = async (jobId, file) => {
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/job/${jobId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/job/${jobId}`);
         if (response.status === 404) {
           console.warn("Job not found yet, retrying...");
           return;
@@ -82,7 +82,7 @@ function VideoUpload() {
 
     try {
       // 1. Upload to Node.js Orchestrator
-      const response = await fetch("http://localhost:5000/api/upload", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/upload`, {
         method: "POST",
         body: formData,
       });

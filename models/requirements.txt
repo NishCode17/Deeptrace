@@ -1,8 +1,13 @@
 Flask
+flask-cors
 torch
+torchvision
 efficientnet-pytorch
 albumentations
 numpy
 scipy
+pandas
+Pillow
+matplotlib
+opencv-python-headless
 requests
-flask_cors

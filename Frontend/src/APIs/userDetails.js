@@ -2,12 +2,12 @@ import axios from "axios";
 
 export const getUserDetails = async () => {
     try {
-        const response = await axios.get("http://localhost:5000/getUserDetails", {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/getUserDetails`, {
             withCredentials: true,
         });
         console.log(response);
         // No need to return anything
-        if(response.data === "") {
+        if (response.data === "") {
             window.location.href = "/login";
             return null;
         }

@@ -99,4 +99,6 @@ def add_headers(response):
 
 if __name__ == '__main__':
     # Running on port 8080 as expected
-    app.run(debug=True, port = 8080)
+    # Use PORT env var for deployment (default 7860 for HF Spaces), listen on all interfaces
+    port = int(os.environ.get("PORT", 7860))
+    app.run(host='0.0.0.0', port=port)

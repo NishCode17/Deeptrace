@@ -11,19 +11,19 @@ function Login() {
       </div>
       <div className='bg-[#252525] px-12 py-16 rounded-[20px]'>
         <div>
-            <div className='text-sm font-semibold text-[#787878]'>Log In</div>
-            <div className='text-3xl font-semibold'>Welcome Back!</div>
+          <div className='text-sm font-semibold text-[#787878]'>Log In</div>
+          <div className='text-3xl font-semibold'>Welcome Back!</div>
         </div>
 
         <div className='mt-8'>
-            {/* <div className='text-md font-semibold'>Sign up via Social Channels</div> */}
-            <div className='text-md '>New User? <a href='/signup' className='text-[#1473E6]'>Sign Up</a></div>
+          {/* <div className='text-md font-semibold'>Sign up via Social Channels</div> */}
+          <div className='text-md '>New User? <a href='/signup' className='text-[#1473E6]'>Sign Up</a></div>
         </div>
 
         <div className='mt-8' >
-            <button onClick={() => {
-                        window.location.href = "http://localhost:5000/auth/google";
-                    }} className='w-[360px] flex gap-4 justify-center items-center px-4 py-2.5 rounded-full border border-1 border-[#f1f3f515] text-smd hover:bg-[#f1f3f505]'><FcGoogle className='scale-[1.5]'/> Log In with Google</button>
+          <button onClick={() => {
+            window.location.href = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/auth/google`;
+          }} className='w-[360px] flex gap-4 justify-center items-center px-4 py-2.5 rounded-full border border-1 border-[#f1f3f515] text-smd hover:bg-[#f1f3f505]'><FcGoogle className='scale-[1.5]' /> Log In with Google</button>
         </div>
 
         <div className="mt-1">

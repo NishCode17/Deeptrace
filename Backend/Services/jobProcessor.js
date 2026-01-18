@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const Job = require('../Models/job');
 
-const FLASK_URL = 'http://localhost:8080/predict';
+const FLASK_URL = process.env.PYTHON_SERVICE_URL || 'http://localhost:8080/predict';
 
 async function processJob(jobId) {
     let filePath = null;
