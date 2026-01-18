@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { getUserDetails } from "../../APIs/userDetails";
-import { fetchVideos, loadProvider } from "../../contractDeets";
+// import { fetchVideos, loadProvider } from "../../contractDeets";
 import logo from '/src/assets/deeptrace_logo_transparent.png'
 
 
