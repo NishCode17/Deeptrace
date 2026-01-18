@@ -119,11 +119,11 @@ app.get(
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:5173/login",
+    failureRedirect: `${process.env.FRONTEND_URL || "http://localhost:5173"}/login`,
   }),
   (req, res) => {
     console.log("authenticated User: ", req.user);
-    res.redirect("http://localhost:5173/home");
+    res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/home`);
   }
 );
 
