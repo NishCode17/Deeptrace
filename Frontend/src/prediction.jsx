@@ -24,6 +24,7 @@ function VideoUpload() {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Important for cookies
       body: JSON.stringify({ filename: file.name, result: result, accuracy: accuracy }),
     })
       .then((response) => {
@@ -37,7 +38,9 @@ function VideoUpload() {
   const pollJobStatus = async (jobId, file) => {
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/job/${jobId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/job/${jobId}`, {
+          credentials: "include", // Important for cookies
+        });
         if (response.status === 404) {
           console.warn("Job not found yet, retrying...");
           return;
@@ -84,6 +87,7 @@ function VideoUpload() {
       // 1. Upload to Node.js Orchestrator
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/upload`, {
         method: "POST",
+        credentials: "include", // Important for cookies
         body: formData,
       });
 
