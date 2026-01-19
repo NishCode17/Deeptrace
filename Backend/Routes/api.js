@@ -73,6 +73,21 @@ router.post('/upload', upload.single('video'), async (req, res) => {
     }
 });
 
+// GET /api/history
+router.get('/history', async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const jobs = await Job.find({ userId: req.user._id }).sort({ createdAt: -1 });
+        res.status(200).json(jobs);
+    } catch (error) {
+        console.error('History Fetch Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 // GET /api/job/:id
 router.get('/job/:id', async (req, res) => {
     try {

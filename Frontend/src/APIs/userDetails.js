@@ -17,3 +17,15 @@ export const getUserDetails = async () => {
         return null; // Return null in case of error
     }
 };
+
+export const getUserHistory = async () => {
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/history`, {
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+};
