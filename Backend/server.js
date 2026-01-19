@@ -29,6 +29,9 @@ const app = express();
 const port = 5000;
 
 app.use(express.json());
+// Required for Render/Heroku (behind proxy) to allow secure cookies
+app.set("trust proxy", 1);
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -36,8 +39,10 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      // Secure must be true in production (HTTPS), false in dev (HTTP)
+      secure: process.env.NODE_ENV === "production" || process.env.FRONTEND_URL?.includes("https"),
+      // SameSite must be "none" for cross-site cookies (Vercel <-> Render)
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
     store: MongoStore.create({
       mongoUrl: mongoURI,
